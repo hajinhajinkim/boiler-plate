@@ -1,23 +1,35 @@
 const express = require('express')
 const app = express()
 const port = 3000
+const bodyParser = require('body-parser');
+const { User } = require('./models/User')
 
-// const MongoClient = require('mongodb').MongoClient;
-// const uri = "mongodb+srv://sonhajin99:smartfake99@boilerplate.cu2ek.mongodb.net/boilerplate?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-// client.connect(err => {
-//   const collection = client.db("test").collection("devices");
-//   // perform actions on the collection object
-//   client.close();
-// });
+const config = require('./config/key')
+
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 const mongoose = require('mongoose');
-mongoose.connect("mongodb+srv://sonhajin99:smartfake99@boilerplate.cu2ek.mongodb.net/boilerplate?retryWrites=true&w=majority",{
+mongoose.connect(config.mongoURI,{
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true
 }).then(()=>console.log('yeah cool'))
 .catch(()=>console.log('whatever'))
 
 
-app.get('/', (req,res)=>res.send('hello world!'))
+app.get('/', (req,res)=>res.send('hello world! my man this is so cool'))
+
+app.post('/register',(req,res)=>{
+    const user = new User(req.body)
+    user.save((err, userInfo)=>{
+        if(err) return res.json({ success: false, err })
+        return res.status(200).json({
+            success: true
+        })
+    })
+
+})
+
+
 app.listen(port, ()=> console.log(`Example app listening on port ${port}!`))
